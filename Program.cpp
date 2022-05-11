@@ -1,6 +1,8 @@
 #include "Program.h"
 #include <iostream>
 
+using namespace std;
+
 Program::Program() {
 	
 }
@@ -10,8 +12,6 @@ Program::~Program() {
 
 void Program::Init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
 	int flags = 0;
-	x = 50;
-	y = 50;
 	if (fullscreen) flags = SDL_WINDOW_FULLSCREEN;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
@@ -25,13 +25,48 @@ void Program::Init(const char* title, int xpos, int ypos, int width, int height,
 			SDL_SetRenderDrawColor(rend, 15, 15, 20, 255);
 			std::cout << "Renderer Created" << std::endl;
 		}
-		r1.w = 40;
-		r1.h = 40;
 
 		isRunning = true;
 	}
 	else {
 		isRunning = false;
+	}
+
+
+	for (int i = 0; i < 20; ++i) {
+		srand(time(0));
+
+		if (i == 0) {
+			x = rand() % 40;
+			y = rand() % 40;
+			temp.coord.x = x;
+			temp.coord.y = y;
+			org.push_back(temp);
+			grid[x][y] = &org.back();
+		}
+		else {
+			cout << "pocetak" << endl;
+			bool pass = false;
+			while (!pass) {
+				x = rand() % 40;
+				y = rand() % 40;
+				if (grid[x][y] == NULL) pass = true;
+			}
+			cout << "kraj" << endl;
+			temp.coord.x = x;
+			temp.coord.y = y;
+			org.push_back(temp);
+			grid[x][y] = &org.back();
+		}
+	}
+
+	for (Organism i : org) {
+		SDL_Rect r;
+		r.x = i.coord.x * 10;
+		r.y = i.coord.y * 10;
+		r.w = 10;
+		r.h = 10;
+		rect.push_back(r);
 	}
 }
 
@@ -45,25 +80,39 @@ void Program::HandleEvents() {
 			isRunning = false;
 			break;
 
+		case SDL_KEYDOWN:
+			if (event.key.keysym.sym == SDLK_t) reset = true;
+			else reset = false;
+			break;
+
 		default:
 			break;
 	}
 }
-void Program::Update() {
-	SDL_GetMouseState(&x, &y);
 
-	r1.x = x-20;
-	r1.y = y-20;
+void Program::Update() {
+	if (reset) {
+		cout << "Reset" << endl;
+	}
 }
 
 void Program::Render() {
+	const Uint8* keystates = SDL_GetKeyboardState(NULL);
+
 	SDL_SetRenderDrawColor(rend, 15, 15, 20, 255);
 	SDL_RenderClear(rend);
-	SDL_SetRenderDrawColor(rend, 255, 0, 20, 255);
+	if (keystates[SDL_SCANCODE_R]) SDL_SetRenderDrawColor(rend, 0, 255, 20, 255);
+	else if(!reset) SDL_SetRenderDrawColor(rend, 255, 0, 20, 255);
+	else SDL_SetRenderDrawColor(rend, 20, 0, 255, 255);
 	
-	SDL_RenderDrawRect(rend, &r1);
-	SDL_RenderFillRect(rend, &r1);
+	for (SDL_Rect i : rect) {
+		SDL_RenderDrawRect(rend, &i);
+		SDL_RenderFillRect(rend, &i);
+	}
+	
 	SDL_RenderPresent(rend);
+
+	reset = false;
 }
 void Program::Clean() {
 	SDL_DestroyWindow(window);

@@ -2,10 +2,13 @@
 #undef main
 #include <iostream>
 #include "Program.h"
+#include "Organism.h"
 
 Program* prog = nullptr;
 
 int main() {
+	//vector<Organism> vecOrg;
+
 	const int frameRate = 60;
 	const int frameDelay = 1000 / frameRate;
 
