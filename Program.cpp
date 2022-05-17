@@ -1,4 +1,5 @@
 #include "Program.h"
+#include "Global.h"
 #include <iostream>
 
 using namespace std;
@@ -37,8 +38,8 @@ void Program::Init(const char* title, int xpos, int ypos, int width, int height,
 		srand(time(0));
 
 		if (i == 0) {
-			x = rand() % 40;
-			y = rand() % 40;
+			x = rand() % 100;
+			y = rand() % 100;
 			temp.coord.x = x;
 			temp.coord.y = y;
 			org.push_back(temp);
@@ -48,8 +49,8 @@ void Program::Init(const char* title, int xpos, int ypos, int width, int height,
 			cout << "pocetak" << endl;
 			bool pass = false;
 			while (!pass) {
-				x = rand() % 40;
-				y = rand() % 40;
+				x = rand() % 100;
+				y = rand() % 100;
 				if (grid[x][y] == NULL) pass = true;
 			}
 			cout << "kraj" << endl;
@@ -58,15 +59,6 @@ void Program::Init(const char* title, int xpos, int ypos, int width, int height,
 			org.push_back(temp);
 			grid[x][y] = &org.back();
 		}
-	}
-
-	for (Organism i : org) {
-		SDL_Rect r;
-		r.x = i.coord.x * 10;
-		r.y = i.coord.y * 10;
-		r.w = 10;
-		r.h = 10;
-		rect.push_back(r);
 	}
 }
 
@@ -91,6 +83,17 @@ void Program::HandleEvents() {
 }
 
 void Program::Update() {
+	rect.clear();
+
+	for (Organism i : org) {
+		SDL_Rect r;
+		r.x = i.coord.x * 4;
+		r.y = i.coord.y * 4;
+		r.w = 4;
+		r.h = 4;
+		rect.push_back(r);
+	}
+
 	if (reset) {
 		cout << "Reset" << endl;
 	}

@@ -2,17 +2,14 @@
 #define Organism_HEADER
 
 #include "Global.h"
-
-struct Coord {
-	int x;
-	int y;
-};
+#include "Genome.h"
 
 class Organism {
 public:
 	bool alive;
 	Coord coord;
 	int priority;
+	uint16_t food;
 };
 
 #endif

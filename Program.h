@@ -33,7 +33,7 @@ private:
 	std::vector<SDL_Rect> rect;
 	std::vector<Organism> org;
 	Organism temp;
-	Organism* grid[40][40] = {};
+	Organism* grid[100][100] = {};
 };
 
 #endif
