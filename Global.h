@@ -7,17 +7,13 @@
 
 using namespace std;
 
-struct Parameters {
-	int PopulationSize;
-	int NumberOfGenerations;
-};
-
 enum Dir {N,NE,E,SE,S,SW,W,NW};
 
 struct Coord {
 	int x;
 	int y;
 };
+
 
 string HexDigitToBin(char h);
 

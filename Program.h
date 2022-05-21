@@ -28,12 +28,11 @@ private:
 	int y;
 	bool isRunning;
 	bool reset;
+	int steps;
 	SDL_Window* window;
 	SDL_Renderer* rend;
 	std::vector<SDL_Rect> rect;
 	std::vector<Organism> org;
-	Organism temp;
-	Organism* grid[100][100] = {};
 };
 
 #endif

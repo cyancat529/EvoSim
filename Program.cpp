@@ -1,8 +1,11 @@
 #include "Program.h"
 #include "Global.h"
+#include "Randomize.h"
 #include <iostream>
 
 using namespace std;
+
+int grid[100][100];
 
 Program::Program() {
 	
@@ -13,6 +16,7 @@ Program::~Program() {
 
 void Program::Init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
 	int flags = 0;
+	steps = 0;
 	if (fullscreen) flags = SDL_WINDOW_FULLSCREEN;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
@@ -34,30 +38,40 @@ void Program::Init(const char* title, int xpos, int ypos, int width, int height,
 	}
 
 
-	for (int i = 0; i < 20; ++i) {
-		srand(time(0));
+	memset(grid, 0, sizeof(grid));
+
+	srand(time(0));
+
+	for (int i = 0; i < generationSize; ++i) {
+		Organism temp;
+		temp.genCode = randomGenCode();
+		temp.Init();
 
 		if (i == 0) {
 			x = rand() % 100;
 			y = rand() % 100;
 			temp.coord.x = x;
 			temp.coord.y = y;
+			temp.lastCoord.x = x;
+			temp.lastCoord.y = y;
+			temp.id = i + 1;
 			org.push_back(temp);
-			grid[x][y] = &org.back();
+			grid[x][y] = i+1;
 		}
 		else {
-			cout << "pocetak" << endl;
 			bool pass = false;
 			while (!pass) {
 				x = rand() % 100;
 				y = rand() % 100;
-				if (grid[x][y] == NULL) pass = true;
+				if (grid[x][y] == 0) pass = true;
 			}
-			cout << "kraj" << endl;
 			temp.coord.x = x;
 			temp.coord.y = y;
+			temp.lastCoord.x = x;
+			temp.lastCoord.y = y;
+			temp.id = i + 1;
 			org.push_back(temp);
-			grid[x][y] = &org.back();
+			grid[x][y] = i + 1;
 		}
 	}
 }
@@ -85,6 +99,19 @@ void Program::HandleEvents() {
 void Program::Update() {
 	rect.clear();
 
+	if(steps < 300)  {
+		for (int i = 0; i < org.size(); ++i) {
+			Coord cTemp;
+			cTemp.x = org[i].coord.x;
+			cTemp.y = org[i].coord.y;
+			org[i].age += 1;
+			org[i].lastCoord = cTemp;
+			org[i].makeStep();
+			grid[cTemp.x][cTemp.y] = 0;
+			grid[org[i].coord.x][org[i].coord.y] = org[i].id;
+		}
+	}
+
 	for (Organism i : org) {
 		SDL_Rect r;
 		r.x = i.coord.x * 4;
@@ -94,9 +121,7 @@ void Program::Update() {
 		rect.push_back(r);
 	}
 
-	if (reset) {
-		cout << "Reset" << endl;
-	}
+	steps += 1;
 }
 
 void Program::Render() {
@@ -106,7 +131,7 @@ void Program::Render() {
 	SDL_RenderClear(rend);
 	if (keystates[SDL_SCANCODE_R]) SDL_SetRenderDrawColor(rend, 0, 255, 20, 255);
 	else if(!reset) SDL_SetRenderDrawColor(rend, 255, 0, 20, 255);
-	else SDL_SetRenderDrawColor(rend, 20, 0, 255, 255);
+	//else //SDL_SetRenderDrawColor(rend, 20, 0, 255, 255);
 	
 	for (SDL_Rect i : rect) {
 		SDL_RenderDrawRect(rend, &i);
