@@ -1,3 +1,3 @@
 # EvoSim
 
-Hoću da se ubijem
+Simulator evolucije pisan u C++ programskom jeziku i pomoću OpenGL biblioteke SDL.
