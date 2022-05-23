@@ -4,6 +4,7 @@
 #include <iostream>
 #include <time.h>
 #include <vector>
+#include <chrono>
 
 #include "SDL.h"
 #include "Organism.h"
@@ -24,13 +25,17 @@ public:
 	bool Running() { return isRunning; };
 
 private:
+	chrono::time_point<std::chrono::steady_clock> startT, endT;
 	int x;
 	int y;
+	bool generationInProgress;
 	bool isRunning;
 	bool reset;
 	int steps;
 	SDL_Window* window;
 	SDL_Renderer* rend;
+	SDL_Rect background;
+	SDL_Rect button, borderL, borderR;
 	std::vector<SDL_Rect> rect;
 	std::vector<Organism> org;
 };

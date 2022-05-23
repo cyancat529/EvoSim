@@ -57,6 +57,23 @@ public:
 		}
 	}
 
+	// Kombinovanje Gena
+	string operator+ (Organism const &org) {
+		if (genCode.size() != org.genCode.size()) return "";
+		string temp = "";
+		for (int i = 0; i < genCode.size() / 8; ++i) {
+			int k = rand() % 2;
+			if (k == 0) temp += genCode.substr(i*8,8);
+			if (k == 1) temp += org.genCode.substr(i*8, 8);
+		}
+		if (mutation && randomChance(mutationChance)) {
+			int r = rand() % 8;
+			if (temp[r] = hexDigits[rand() % 16]);
+		}
+
+		return temp;
+	}
+
 	// Cula
 	float SensorXPos(Coord c) {
 		return float(c.x) / 100;
@@ -203,5 +220,7 @@ public:
 		}
 	}
 };
+
+
 
 #endif

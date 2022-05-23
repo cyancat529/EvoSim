@@ -1,11 +1,15 @@
 #include "Program.h"
 #include "Global.h"
 #include "Randomize.h"
+#include "InitGen.h"
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
 int grid[100][100];
+int generationNumber;
+bool autorun = true;
 
 Program::Program() {
 	
@@ -16,7 +20,11 @@ Program::~Program() {
 
 void Program::Init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen) {
 	int flags = 0;
+	generationNumber = 1;
+	generationInProgress = true;
 	steps = 0;
+	startT = std::chrono::high_resolution_clock::now();
+
 	if (fullscreen) flags = SDL_WINDOW_FULLSCREEN;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
@@ -36,7 +44,6 @@ void Program::Init(const char* title, int xpos, int ypos, int width, int height,
 	else {
 		isRunning = false;
 	}
-
 
 	memset(grid, 0, sizeof(grid));
 
@@ -74,6 +81,26 @@ void Program::Init(const char* title, int xpos, int ypos, int width, int height,
 			grid[x][y] = i + 1;
 		}
 	}
+
+	background.x = 0;
+	background.y = 0;
+	background.w = 400;
+	background.h = 400;
+
+	button.x = 550;
+	button.y = 300;
+	button.w = 100;
+	button.h = 50;
+
+	borderL.x = 0;
+	borderL.y = 0;
+	borderL.w = 60;
+	borderL.h = 400;
+
+	borderR.x = 340;
+	borderR.y = 0;
+	borderR.w = 60;
+	borderR.h = 400;
 }
 
 void Program::HandleEvents() {
@@ -87,8 +114,12 @@ void Program::HandleEvents() {
 			break;
 
 		case SDL_KEYDOWN:
-			if (event.key.keysym.sym == SDLK_t) reset = true;
-			else reset = false;
+			if (event.key.keysym.sym == SDLK_g && !generationInProgress && !autorun) {
+				generationInProgress = true;
+				generationNumber++;
+				steps = 0;
+				org = InitGen(org, generationNumber, generationSize);
+			}
 			break;
 
 		default:
@@ -99,7 +130,17 @@ void Program::HandleEvents() {
 void Program::Update() {
 	rect.clear();
 
-	if(steps < 300)  {
+	if (autorun && generationNumber <= autorunNumOfGen && !generationInProgress) {
+		generationInProgress = true;
+		generationNumber++;
+		steps = 0;
+		org = InitGen(org, generationNumber, generationSize);
+		if (generationNumber == autorunNumOfGen) {
+			autorun = false;
+		}
+	}
+
+	if(steps < 300 && generationInProgress) {
 		for (int i = 0; i < org.size(); ++i) {
 			Coord cTemp;
 			cTemp.x = org[i].coord.x;
@@ -111,6 +152,13 @@ void Program::Update() {
 			grid[org[i].coord.x][org[i].coord.y] = org[i].id;
 		}
 	}
+	if (steps == 300) {
+		generationInProgress = false;
+		endT = std::chrono::high_resolution_clock::now();
+		float exTime = float(std::chrono::duration_cast<std::chrono::milliseconds>(endT - startT).count()) / 1000;
+		cout << "Execution time: " << exTime << "s" << endl;
+	}
+
 
 	for (Organism i : org) {
 		SDL_Rect r;
@@ -127,12 +175,29 @@ void Program::Update() {
 void Program::Render() {
 	const Uint8* keystates = SDL_GetKeyboardState(NULL);
 
-	SDL_SetRenderDrawColor(rend, 15, 15, 20, 255);
+	SDL_SetRenderDrawColor(rend, 0, 0, 0, 255);
 	SDL_RenderClear(rend);
-	if (keystates[SDL_SCANCODE_R]) SDL_SetRenderDrawColor(rend, 0, 255, 20, 255);
-	else if(!reset) SDL_SetRenderDrawColor(rend, 255, 0, 20, 255);
-	//else //SDL_SetRenderDrawColor(rend, 20, 0, 255, 255);
+
+	SDL_SetRenderDrawColor(rend, 15, 15, 20, 255);
+	SDL_RenderDrawRect(rend, &background);
+	SDL_RenderFillRect(rend, &background);
+
+	SDL_SetRenderDrawColor(rend, 40, 80, 125, 255);
+	SDL_RenderDrawRect(rend, &borderL);
+	SDL_RenderFillRect(rend, &borderL);
+
+	SDL_SetRenderDrawColor(rend, 40, 80, 125, 255);
+	SDL_RenderDrawRect(rend, &borderR);
+	SDL_RenderFillRect(rend, &borderR);
 	
+	/*SDL_SetRenderDrawColor(rend, 255, 15, 45, 255);
+	SDL_RenderDrawRect(rend, &button);
+	SDL_RenderFillRect(rend, &button);*/
+
+	if(generationInProgress) SDL_SetRenderDrawColor(rend, 255, 0, 20, 255);
+	else SDL_SetRenderDrawColor(rend, 0, 255, 20, 255);
+	//else //SDL_SetRenderDrawColor(rend, 20, 0, 255, 255);
+
 	for (SDL_Rect i : rect) {
 		SDL_RenderDrawRect(rend, &i);
 		SDL_RenderFillRect(rend, &i);

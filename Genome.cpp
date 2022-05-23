@@ -5,7 +5,6 @@ Gene ReadGenCode(string code) {
 	Gene temp;
 	SensorType st = END_S;
 	ActionType at = END_A;
-
 	
 	string codeBin;
 	for (char i : code) codeBin += HexDigitToBin(i);
