@@ -4,8 +4,9 @@
 #include <ctime>
 #include <string>
 #include <random>
+#include "Param.h"
 
 bool randomChance(float f);
-std::string randomGenCode();
+std::string randomGenCode(Param p);
 
 #endif

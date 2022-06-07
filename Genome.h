@@ -28,7 +28,7 @@ struct Gene {
 typedef vector<Gene> Genome;
 Genome operator+(const Genome& g1, const Genome& g2);
 
-Gene ReadGenCode(string code);
+Gene ReadGenCode(string code, Param p);
 void PrintGene(Gene g);
 
 

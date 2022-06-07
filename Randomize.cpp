@@ -8,9 +8,9 @@ bool randomChance(float f) {
 	}
 }
 
-std::string randomGenCode() {
+std::string randomGenCode(Param p) {
 	std::string s = "";
-	for (int i = 0; i < geneSize*8; ++i) {
+	for (int i = 0; i < p.geneSize*8; ++i) {
 		int x = rand()%16;
         switch (x) {
         case 0: s += "0"; break;

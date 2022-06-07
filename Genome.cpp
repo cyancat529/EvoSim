@@ -1,7 +1,7 @@
 #include "Genome.h"
 #include "Randomize.h"
 
-Gene ReadGenCode(string code) {
+Gene ReadGenCode(string code, Param p) {
 	Gene temp;
 	SensorType st = END_S;
 	ActionType at = END_A;
@@ -14,13 +14,13 @@ Gene ReadGenCode(string code) {
 	temp.input_type %= 2;
 	temp.input = stoul(codeBin.substr(1, 7), nullptr, 2); // Konvertovanje binarne vrednosti u ceo broj
 	if (temp.input_type == Sensor) temp.input %= st;
-	else temp.input %= 4; //number of neurons
+	else temp.input %= p.numberOfNeurons; //number of neurons
 
 	temp.output_type = codeBin[8] - 60;
 	temp.output_type %= 2;
 	temp.output = stoul(codeBin.substr(9, 15), nullptr, 2);
 	if (temp.output_type == Action) temp.output %= at;
-	else temp.output %= 4; //number of neurons
+	else temp.output %= p.numberOfNeurons; 
 
 	float x = stoul(codeBin.substr(16, 31), nullptr, 2);
 	temp.weight = x / 8192; // Dobijamo vrednost jacine veze od -4.0 do 4.0

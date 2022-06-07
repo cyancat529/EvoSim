@@ -1,11 +1,11 @@
 #include "InitGen.h"
 
-vector<Organism> InitGen(vector<Organism> vecPrev, int genNum, int genSize) {
+vector<Organism> InitGen(vector<Organism> vecPrev, int genNum, int genSize, Param p) {
 	memset(grid, 0, sizeof(grid));
 
 	vector<Organism> vecSurv;
 	vector<Organism> vecNewGen;
-	vecSurv = naturalSelection(vecPrev, 15);
+	vecSurv = naturalSelection(vecPrev, p.survivalRange, p.survivalCrit);
 	int tempSize = vecSurv.size();
 	cout << "Generation " << genNum - 1 << " survival rate: " << float(tempSize) / float(genSize) * 100 << "%" << endl;
 
@@ -16,7 +16,7 @@ vector<Organism> InitGen(vector<Organism> vecPrev, int genNum, int genSize) {
 		while (i2 == i1) i2 = rand() % tempSize;
 		Organism temp;
 		temp.genCode = vecSurv[i1] + vecSurv[i2];
-		temp.Init();
+		temp.Init(p);
 
 		if (i == 0) {
 			x = rand() % 100;

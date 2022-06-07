@@ -1,5 +1,6 @@
 #ifndef Organism_HEADER
 #define Organism_HEADER
+#define maxNeurons 64
 
 #include "Global.h"
 #include "Genome.h"
@@ -25,14 +26,15 @@ public:
 	bool activeActionsB[END_A] = {};
 	vector<unsigned short> activeSensors;  // Lista aktivnih cula
 	vector<unsigned short> activeActions;  // Lista aktivnih akcija
-	bool activeNeurons[numberOfNeurons] = {};  // Lista aktivnosti neurona
+	bool activeNeurons[maxNeurons] = {};  // Lista aktivnosti neurona
 	float sensorInput[END_S] = {};
-	float neuronInput[numberOfNeurons] = {};
+	float neuronInput[maxNeurons] = {};
+	Param p;
 
-	vector<unsigned short> neuronInputs[numberOfNeurons];
-	vector<unsigned short> neuronInputW[numberOfNeurons];
-	float neuronInputValue[numberOfNeurons];
-	float neuronOutputValue[numberOfNeurons];
+	vector<unsigned short> neuronInputs[maxNeurons];
+	vector<unsigned short> neuronInputW[maxNeurons];
+	float neuronInputValue[maxNeurons];
+	float neuronOutputValue[maxNeurons];
 
 	vector<unsigned short> actionInputs[END_A];
 	vector<unsigned short> actionInputW[END_A];
@@ -43,10 +45,10 @@ public:
 	vector<unsigned short> directConnW[END_A];
 
 	void InitGenome() {
-		for (int i = 0; i < geneSize; ++i) {
+		for (int i = 0; i < p.geneSize; ++i) {
 			Gene tempGen;
 			string tempCode = genCode.substr(8 * i, 8);
-			tempGen = ReadGenCode(tempCode);
+			tempGen = ReadGenCode(tempCode, p);
 			genome.push_back(tempGen);
 		}
 	}
@@ -66,7 +68,7 @@ public:
 			if (k == 0) temp += genCode.substr(i*8,8);
 			if (k == 1) temp += org.genCode.substr(i*8, 8);
 		}
-		if (mutation && randomChance(mutationChance)) {
+		if (p.mutation && randomChance(p.mutationChance)) {
 			int r = rand() % 8;
 			if (temp[r] = hexDigits[rand() % 16]);
 		}
@@ -113,7 +115,7 @@ public:
 		return abs(sin(age + r));
 	}
 	float SensorAge() {
-		return age/generationLength;
+		return age/p.generationLength;
 	}
 
 	//Akcije
@@ -137,7 +139,8 @@ public:
 	}
 	
 	//Inicijalizacija
-	void Init() {
+	void Init(Param par) {
+		p = par;
 		InitGenome();
 		//PrintGenome();
 		int i = 0;
@@ -189,7 +192,7 @@ public:
 	//Korak
 	void makeStep() {
 		readSensors();
-		for (int i = 0; i < numberOfNeurons; ++i) {
+		for (int i = 0; i < p.numberOfNeurons; ++i) {
 			neuronInputValue[i] = 0;
 			for (int k = 0; k < neuronInputs[i].size(); ++k) {
 				neuronInputValue[i] += sensorInput[neuronInputs[i][k]] * neuronInputW[i][k];
